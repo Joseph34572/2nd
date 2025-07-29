@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Write to Google Sheet</title>
+  <style>
+    body { font-family: Arial; padding: 2rem; text-align: center; }
+    textarea { width: 80%; height: 100px; margin-bottom: 1rem; }
+    button { padding: 0.5rem 1rem; font-size: 1rem; }
+    .status { margin-top: 1rem; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>Send Message to Google Sheet</h1>
+  <textarea id="text" placeholder="Write your message here..."></textarea><br>
+  <button onclick="sendData()">Submit</button>
+  <div class="status" id="status"></div>
+
+  <script>
+    async function sendData() {
+      const text = document.getElementById("text").value.trim();
+      const status = document.getElementById("status");
+
+      if (!text) {
+        status.textContent = "Please enter a message.";
+        return;
+      }
+
+      try {
+        const res = await fetch("https://script.google.com/macros/s/AKfycbyu3OgQ8riK5EL2pa7Z9Aehd5SyGLFBSd_isOuUArHRiYzDaTmM1hUrLZ20OHd8vZ5i/exec", {
+          method: "POST",
+          body: JSON.stringify({ text }),
+          headers: { "Content-Type": "application/json" }
+        });
+
+        const result = await res.json();
+        status.textContent = result.message;
+        document.getElementById("text").value = "";
+      } catch (err) {
+        console.error("Fetch error:", err);
+        status.textContent = "Error sending data.";
+      }
+    }
+  </script>
+</body>
+</html>

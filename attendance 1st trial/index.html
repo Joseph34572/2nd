@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>NFC Student Registration</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: sans-serif; text-align: center; margin-top: 5rem; }
+    input, button { padding: 1rem; font-size: 1.2rem; margin-top: 1rem; width: 80%; max-width: 300px; }
+    #status { margin-top: 2rem; color: green; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>Register with NFC</h1>
+  <input type="text" id="nameInput" placeholder="Enter your name" />
+  <br>
+  <button id="scanBtn">Scan NFC Card</button>
+  <div id="status"></div>
+
+  <script>
+    const scanBtn = document.getElementById("scanBtn");
+    const nameInput = document.getElementById("nameInput");
+    const statusDiv = document.getElementById("status");
+
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz4fYHbmJI3AqG9qmpfuT7yALAW52MQmHaMCBTrvtk_XPDS_Kn0srH8OZ_K26EPAb-z/exec';
+
+    scanBtn.addEventListener("click", async () => {
+      const name = nameInput.value.trim();
+      if (!name) {
+        statusDiv.textContent = "Please enter a name.";
+        return;
+      }
+
+      if ("NDEFReader" in window) {
+        try {
+          const ndef = new NDEFReader();
+          await ndef.scan();
+
+          statusDiv.textContent = "Waiting for NFC card...";
+
+          ndef.onreading = async (event) => {
+            const uid = event.serialNumber;
+
+            if (!uid) {
+              statusDiv.textContent = "Card UID not found.";
+              return;
+            }
+
+            const data = { name, uid };
+
+            const response = await fetch(SCRIPT_URL, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(data),
+            });
+
+            const result = await response.text();
+            statusDiv.textContent = result.includes("Success")
+              ? "✅ Registered successfully"
+              : "❌ Failed: " + result;
+          };
+        } catch (err) {
+          statusDiv.textContent = "NFC Scan failed: " + err;
+        }
+      } else {
+        statusDiv.textContent = "NFC not supported on this device.";
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>نموذج تسجيل البيانات</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #f9f9f9;
+      padding: 30px;
+      max-width: 400px;
+      margin: auto;
+    }
+    input, select, textarea, button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <h2>نموذج تسجيل البيانات</h2>
+  <input type="text" id="name" placeholder="الاسم" required>
+  <input type="email" id="email" placeholder="البريد الإلكتروني">
+  <input type="text" id="phone" placeholder="رقم الهاتف">
+  <select id="category">
+    <option value="">اختر التصنيف</option>
+    <option value="A">A</option>
+    <option value="B">B</option>
+  </select>
+  <textarea id="message" placeholder="رسالة (اختياري)"></textarea>
+  <button onclick="submitForm()">إرسال</button>
+
+  <script>
+    function submitForm() {
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+      const phone = document.getElementById("phone").value;
+      const category = document.getElementById("category").value;
+      const message = document.getElementById("message").value;
+
+      if (!name) {
+        alert("من فضلك أدخل الاسم");
+        return;
+      }
+
+      const params = new URLSearchParams({
+        name, email, phone, category, message
+      });
+
+      // ضع هنا رابط الـ Google Apps Script الخاص بك بعد النشر كـ web app
+      const scriptURL = "https://script.google.com/macros/s/AKfycbzHglmn-hbUL7UD-sJ1JDGe3qmlhdGTaivSecz_8MVnKzgAA6nfoHJgbvvbWW_7Kh8yrg/exec";
+
+      window.open(`${scriptURL}?${params.toString()}`, "_blank");
+    }
+  </script>
+</body>
+</html>
